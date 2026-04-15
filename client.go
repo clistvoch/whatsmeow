@@ -4,12 +4,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// Package whatsmeow implements a WhatsApp webn	"sync"
-	/whatsmeown	"go.mautypes/events"
-	"go.mau.fi/whatsmeow/util/log"
-)
-
-// EventHandler is a function that can be registered to receive Client is the main WhatsApp client struct.
+// Package whatsbn	"sync"
+t/.mautypes/events"// EventHandler is a function that can WhatsApp client struct.
 type Client struct {
 	Store   *store.Device
 	Log     log.Logger
@@ -83,15 +79,24 @@ func (cli *Client) RemoveAllEventHandlers() {
 }
 
 // dispatchEvent sends the given event to all registered event handlers.
-// Note: handlers are called sequentially; if a handler panics it will stop
-// subsequent handlers from running.
+// Each handler call is wrapped in a recover() so a panicking handler does not
+// prevent the remaining handlers from receiving the event.
 //
-// TODO(personal): wrap each handler call in a recover() so a panicking handler
-// doesn't prevent the remaining handlers from receiving the event. Something like:
-//
-//	defer func() {
-//		if r := recover(); r != nil {
-//			cli.Log.Errorf("panic in event handler %d: %v", handler.id, r)
-//		}
-//	}()
-func (cli *Client) dispatchEvent(evt 
+// NOTE(personal): switched from sequential-fail-on-panic to recover-per-handler.
+// This makes the behavior more robust for my use case where multiple independent
+// handlers are registered and a bug in one shouldn't silently drop events for others.
+func (cli *Client) dispatchEvent(evt interface{}) {
+	cli.eventHandlersLock.RLock()
+	handlers := cli.eventHandlers
+	cli.eventHandlersLock.RUnlock()
+	for _, handler := range handlers {
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					cli.Log.Errorf("panic in event handler %d: %v", handler.id, r)
+				}
+			}()
+			handler.fn(evt)
+		}()
+	}
+}

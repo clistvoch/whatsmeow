@@ -8,12 +8,9 @@
 package whatsmeow
 
 import (
-	"sync"
 	"sync/atomic"
-	"context"
-
-	"go.mau.fi/whatsmeow/store"
-	"go.mau.fi/whatsmeow/types"
+	.fi/whatsmeow/store"
+	/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
 	"go.mau.fi/whatsmeow/util/log"
 )
@@ -100,13 +97,26 @@ func (cli *Client) RemoveAllEventHandlers() {
 //
 //	defer func() {
 //		if r := recover(); r != nil {
-//			cli.Log.Errorf("panic in event handler %d: %v", handler.id, r)
-//		}
-//	}()
 func (cli *Client) dispatchEvent(evt interface{}) {
+	// Take a read lock so handlers can be added/removed concurrently from other
+	// goroutines without blocking the dispatch loop for long.
 	cli.eventHandlersLock.RLock()
-	defer cli.eventHandlersLock.RUnlock()
-	for _, handler := range cli.eventHandlers {
+	handlers := cli.eventHandlers
+	cli.eventHandlersLock.RUnlock()
+	for _, handler := range handlers {
 		handler.fn(evt)
 	}
+}
+
+// IsConnected returns true if the client is currently connected to WhatsApp.
+func (cli *Client) IsConnected() bool {
+	return cli.connected.Load()
+}
+
+// CountEventHandlers returns the number of currently registered event handlers.
+// Useful for debugging handler leaks in long-running applications.
+func (cli *Client) CountEventHandlers() int {
+	cli.eventHandlersLock.RLock()
+	defer cli.eventHandlersLock.RUnlock()
+	return len(cli.eventHandlers)
 }

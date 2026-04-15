@@ -4,21 +4,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// Package types contains various types used by whatsmeow.
+// Package types contains.
 package types
-
-import (
-	"time"
-)
-
-// MessageSource contains the basic sender and chat information for any incoming message.
-type MessageSource struct {
-	// The chat where the message was sent.
-	Chat JID
-	// The sender of the message. If the chat is a group, this is the group member who sent the message.
+	ype MessageSource struct {
+\n	// The sender of the message. If the chat is a group, this is the group member who sent the message.
 	Sender JID
-	// Whether the message was sent by the current user instead ofFromMe bool
-	 group chat.
+	// Whether the message was sent by the current user instead of another contact.
+	FromMe bool
+	// Whether the message was sent in a group chat.
 	IsGroup bool
 }
 
@@ -94,9 +87,4 @@ type Disconnected struct {
 
 // QR is emitted when a QR code is available for scanning.
 type QR struct {
-	// The QR code codes to display. The client should cycle through these
-	// and display a new one every ~20 seconds.
-	Codes []string
-}
-
-// PairSuc
+	// The QR code codes to display. The client should cycle

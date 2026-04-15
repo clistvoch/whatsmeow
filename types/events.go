@@ -17,9 +17,8 @@ type MessageSource struct {
 	Chat JID
 	// The sender of the message. If the chat is a group, this is the group member who sent the message.
 	Sender JID
-	// Whether the message was sent by the current user instead of someone else.
-	IsFromMe bool
-	// Whether the message is in a group chat.
+	// Whether the message was sent by the current user instead ofFromMe bool
+	 group chat.
 	IsGroup bool
 }
 
@@ -77,9 +76,10 @@ const (
 type PresenceEvent struct {
 	// The JID of the contact.
 	From JID
-	// The new presence state.
+	// The new presence state. True means the contact is offline/unavailable.
 	Unavailable bool
 	// The last seen time (only set when Unavailable is true).
+	// Note: WhatsApp only provides this if the contact has their last seen visible to you.
 	LastSeen time.Time
 }
 
@@ -99,12 +99,4 @@ type QR struct {
 	Codes []string
 }
 
-// PairSuccess is emitted after successfully pairing a new device.
-type PairSuccess struct {
-	// The JID assigned to this device.
-	ID JID
-	// The business name of the account (if applicable).
-	BusinessName string
-	// The platform of the device.
-	Platform string
-}
+// PairSuc

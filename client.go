@@ -18,10 +18,7 @@ import (
 	"go.mau.fi/whatsmeow/util/log"
 )
 
-// EventHandler is a function that can be registered to receive events.
-type EventHandler func(evt interface{})
-
-// Client is the main WhatsApp client struct.
+// EventHandler is a function that can be registered to receive Client is the main WhatsApp client struct.
 type Client struct {
 	Store   *store.Device
 	Log     log.Logger
@@ -96,15 +93,20 @@ func (cli *Client) RemoveAllEventHandlers() {
 
 // dispatchEvent sends the given event to all registered event handlers.
 // Note: handlers are called sequentially; if a handler panics it will stop
-// subsequent handlers from running. Consider recovering in your handler.
+// subsequent handlers from running.
 //
-// Personal note: wrapping handler calls in a recover() would be safer for
-// production use, but keeping it simple here for easier debugging.
+// TODO(personal): wrap each handler call in a recover() so a panicking handler
+// doesn't prevent the remaining handlers from receiving the event. Something like:
+//
+//	defer func() {
+//		if r := recover(); r != nil {
+//			cli.Log.Errorf("panic in event handler %d: %v", handler.id, r)
+//		}
+//	}()
 func (cli *Client) dispatchEvent(evt interface{}) {
 	cli.eventHandlersLock.RLock()
-	handlers := cli.eventHandlers
-	cli.eventHandlersLock.RUnlock()
-	for _, handler := range handlers {
+	defer cli.eventHandlersLock.RUnlock()
+	for _, handler := range cli.eventHandlers {
 		handler.fn(evt)
 	}
 }

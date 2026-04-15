@@ -4,14 +4,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// Package whatsmeow implements a WhatsApp web client.
-package whatsmeow
-
-import (
-	"sync/atomic"
-	.fi/whatsmeow/store"
-	/whatsmeow/types"
-	"go.mau.fi/whatsmeow/types/events"
+// Package whatsmeow implements a WhatsApp webn	"sync"
+	/whatsmeown	"go.mautypes/events"
 	"go.mau.fi/whatsmeow/util/log"
 )
 
@@ -97,26 +91,7 @@ func (cli *Client) RemoveAllEventHandlers() {
 //
 //	defer func() {
 //		if r := recover(); r != nil {
-func (cli *Client) dispatchEvent(evt interface{}) {
-	// Take a read lock so handlers can be added/removed concurrently from other
-	// goroutines without blocking the dispatch loop for long.
-	cli.eventHandlersLock.RLock()
-	handlers := cli.eventHandlers
-	cli.eventHandlersLock.RUnlock()
-	for _, handler := range handlers {
-		handler.fn(evt)
-	}
-}
-
-// IsConnected returns true if the client is currently connected to WhatsApp.
-func (cli *Client) IsConnected() bool {
-	return cli.connected.Load()
-}
-
-// CountEventHandlers returns the number of currently registered event handlers.
-// Useful for debugging handler leaks in long-running applications.
-func (cli *Client) CountEventHandlers() int {
-	cli.eventHandlersLock.RLock()
-	defer cli.eventHandlersLock.RUnlock()
-	return len(cli.eventHandlers)
-}
+//			cli.Log.Errorf("panic in event handler %d: %v", handler.id, r)
+//		}
+//	}()
+func (cli *Client) dispatchEvent(evt 

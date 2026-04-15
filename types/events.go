@@ -1,0 +1,110 @@
+// Copyright (c) 2024 Tulir Asokan
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+// Package types contains various types used by whatsmeow.
+package types
+
+import (
+	"time"
+)
+
+// MessageSource contains the basic sender and chat information for any incoming message.
+type MessageSource struct {
+	// The chat where the message was sent.
+	Chat JID
+	// The sender of the message. If the chat is a group, this is the group member who sent the message.
+	Sender JID
+	// Whether the message was sent by the current user instead of someone else.
+	IsFromMe bool
+	// Whether the message is in a group chat.
+	IsGroup bool
+}
+
+// MessageInfo contains metadata about an incoming message.
+type MessageInfo struct {
+	MessageSource
+	// The unique message ID.
+	ID MessageID
+	// The server-assigned timestamp of the message.
+	Timestamp time.Time
+	// The push name (display name) of the sender.
+	PushName string
+	// Whether the message was broadcast (e.g. status update).
+	Broadcast bool
+}
+
+// MessageID is the ID of a WhatsApp message.
+type MessageID = string
+
+// ReceiptType represents the type of a message receipt.
+type ReceiptType string
+
+const (
+	// ReceiptTypeDelivered indicates the message was delivered to the device.
+	ReceiptTypeDelivered ReceiptType = ""
+	// ReceiptTypeRead indicates the message was read by the user.
+	ReceiptTypeRead ReceiptType = "read"
+	// ReceiptTypePlayed indicates the media message was played by the user.
+	ReceiptTypePlayed ReceiptType = "played"
+)
+
+// Receipt is emitted when a receipt is received for a sent message.
+type Receipt struct {
+	// The source of the receipt (who sent it and in which chat).
+	MessageSource
+	// The IDs of the messages this receipt is for.
+	MessageIDs []MessageID
+	// The timestamp of the receipt.
+	Timestamp time.Time
+	// The type of the receipt.
+	Type ReceiptType
+}
+
+// Presence represents a contact's presence state.
+type Presence string
+
+const (
+	// PresenceAvailable means the contact is online.
+	PresenceAvailable Presence = "available"
+	// PresenceUnavailable means the contact is offline.
+	PresenceUnavailable Presence = "unavailable"
+)
+
+// PresenceEvent is emitted when a contact's presence changes.
+type PresenceEvent struct {
+	// The JID of the contact.
+	From JID
+	// The new presence state.
+	Unavailable bool
+	// The last seen time (only set when Unavailable is true).
+	LastSeen time.Time
+}
+
+// Connected is emitted when the client successfully connects to WhatsApp.
+type Connected struct{}
+
+// Disconnected is emitted when the client disconnects from WhatsApp.
+type Disconnected struct {
+	// Whether the disconnect was requested by the user.
+	LoggedOut bool
+}
+
+// QR is emitted when a QR code is available for scanning.
+type QR struct {
+	// The QR code codes to display. The client should cycle through these
+	// and display a new one every ~20 seconds.
+	Codes []string
+}
+
+// PairSuccess is emitted after successfully pairing a new device.
+type PairSuccess struct {
+	// The JID assigned to this device.
+	ID JID
+	// The business name of the account (if applicable).
+	BusinessName string
+	// The platform of the device.
+	Platform string
+}

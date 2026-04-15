@@ -97,6 +97,9 @@ func (cli *Client) RemoveAllEventHandlers() {
 // dispatchEvent sends the given event to all registered event handlers.
 // Note: handlers are called sequentially; if a handler panics it will stop
 // subsequent handlers from running. Consider recovering in your handler.
+//
+// Personal note: wrapping handler calls in a recover() would be safer for
+// production use, but keeping it simple here for easier debugging.
 func (cli *Client) dispatchEvent(evt interface{}) {
 	cli.eventHandlersLock.RLock()
 	handlers := cli.eventHandlers
@@ -104,9 +107,4 @@ func (cli *Client) dispatchEvent(evt interface{}) {
 	for _, handler := range handlers {
 		handler.fn(evt)
 	}
-}
-
-// IsConnected returns true if the client is currently connected to WhatsApp.
-func (cli *Client) IsConnected() bool {
-	return cli.connected.Load()
 }

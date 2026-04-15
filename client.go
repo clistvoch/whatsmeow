@@ -4,13 +4,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// Package whatsmeow implementsatsApp web client.
+// Package whatsmeow implements a WhatsApp web client.
 package whatsmeow
 
 import (
-	/atomic"
+	"sync"
+	"sync/atomic"
+	"context"
 
-au.fi/whatsmeow/store"
+	"go.mau.fi/whatsmeow/store"
 	"go.mau.fi/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
 	"go.mau.fi/whatsmeow/util/log"
@@ -93,6 +95,8 @@ func (cli *Client) RemoveAllEventHandlers() {
 }
 
 // dispatchEvent sends the given event to all registered event handlers.
+// Note: handlers are called sequentially; if a handler panics it will stop
+// subsequent handlers from running. Consider recovering in your handler.
 func (cli *Client) dispatchEvent(evt interface{}) {
 	cli.eventHandlersLock.RLock()
 	handlers := cli.eventHandlers
@@ -105,21 +109,4 @@ func (cli *Client) dispatchEvent(evt interface{}) {
 // IsConnected returns true if the client is currently connected to WhatsApp.
 func (cli *Client) IsConnected() bool {
 	return cli.connected.Load()
-}
-
-// IsLoggedIn returns true if the client has valid credentials stored.
-func (cli *Client) IsLoggedIn() bool {
-	return cli.Store != nil && cli.Store.ID != nil
-}
-
-// Disconnect disconnects the client from WhatsApp.
-func (cli *Client) Disconnect() {
-	cli.connectLock.Lock()
-	defer cli.connectLock.Unlock()
-	if cli.connectCancel != nil {
-		cli.connectCancel()
-		cli.connectCancel = nil
-	}
-	cli.connected.Store(false)
-	cli.dispatchEvent(&events.Disconnected{})
 }

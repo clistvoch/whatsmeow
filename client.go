@@ -12,21 +12,7 @@ type Client struct {
 	RecipientDevicesCache RecipientDevicesCache
 
 	// Event handlers
-	eventHandlersLock sync.RWMutex
-	eventHandlers     []wrappedEventHandler
-	lastHandlerID     uint32
-
-	// Connection state
-	connected     atomic.Bool
-	connectCancel context.CancelFunc
-	connectLock   sync.Mutex
-
-	// Unique device identifier
-	uniqueID  string
-	identityID []byte
-}
-
-type wrappedEventHandler struct {
+	eEventHandler struct {
 	fn EventHandler
 	id uint32
 }
@@ -85,18 +71,13 @@ func (cli *Client) RemoveAllEventHandlers() {
 // NOTE(personal): switched from sequential-fail-on-panic to recover-per-handler.
 // This makes the behavior more robust for my use case where multiple independent
 // handlers are registered and a bug in one shouldn't silently drop events for others.
+//
+// NOTE(personal): handlers are copied under the read lock so we don't hold the
+// lock while invoking user code, which could deadlock if a handler calls
+// AddEventHandler or RemoveEventHandler.
 func (cli *Client) dispatchEvent(evt interface{}) {
 	cli.eventHandlersLock.RLock()
 	handlers := cli.eventHandlers
 	cli.eventHandlersLock.RUnlock()
 	for _, handler := range handlers {
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					cli.Log.Errorf("panic in event handler %d: %v", handler.id, r)
-				}
-			}()
-			handler.fn(evt)
-		}()
-	}
-}
+		fun

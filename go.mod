@@ -17,3 +17,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	golang.org/x/sys v0.20.0 // indirect
 )
+
+// Personal fork - tracking upstream tulir/whatsmeow
+// Last synced: 2024-05

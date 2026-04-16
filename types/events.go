@@ -4,12 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// Package types contains.
-package types
-	ype MessageSource struct {
-\n	// The sender of the message. If the chat is a group, this is the group member who sent the message.
-	Sender JID
-	// Whether the message was sent by the current user instead of another contact.
+// Package types contains types by the whatsmeow libraryn// MessageSource the source information of a group, this is the group membert// Whether the message was sent by the current user instead of another contact.
 	FromMe bool
 	// Whether the message was sent in a group chat.
 	IsGroup bool
@@ -81,7 +76,8 @@ type Connected struct{}
 
 // Disconnected is emitted when the client disconnects from WhatsApp.
 type Disconnected struct {
-	// Whether the disconnect was requested by the user.
+	// Whether the disconnect was requested by the user (i.e. logged out).
+	// If false, the disconnect was likely due to a network error or server-side kick.
 	LoggedOut bool
 }
 

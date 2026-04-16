@@ -4,7 +4,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// Package types contains types by the whatsmeow libraryn// MessageSource the source information of a group, this is the group membert// Whether the message was sent by the current user instead of another contact.
+// Package types contains types by the whatsmeow library
+// MessageSource contains the source information of a messagentype MessageSource struct {
+t where the message was sent.
+	ID
+	// The sender the message.
+	Sender the message was sent by the current user instead of another contact.
 	FromMe bool
 	// Whether the message was sent in a group chat.
 	IsGroup bool

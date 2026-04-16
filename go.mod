@@ -20,3 +20,4 @@ require (
 
 // Personal fork - tracking upstream tulir/whatsmeow
 // Last synced: 2024-05
+// Note: using this for learning purposes; see my notes in PERSONAL_NOTES.md

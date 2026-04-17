@@ -4,12 +4,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// Package types contains types used byatsmeow.
-package types
-
-importID represents a WhID (Jabber ID).
-type JID struct   string
-	Agent  uint8
+// Package types contains types used by WhatsApp JID ( JID struct {
+	  uint8
 	Device uint8
 	Server string
 	AD     bool

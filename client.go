@@ -5,12 +5,11 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // Package whatsbn	"sync"
-t/.mautypes/events"// EventHandler is a function that can WhatsApp client struct.
+t/.mautypes/events// EventHandler is a function that can WhatsApp client struct.
 type Client struct {
 	Store   *store.Device
 	Log     log.Logger
-	RecipientDevicesCache RecipientDevicesCache
-
+	
 	// Event handlers
 	eEventHandler struct {
 	fn EventHandler
@@ -75,6 +74,9 @@ func (cli *Client) RemoveAllEventHandlers() {
 // NOTE(personal): handlers are copied under the read lock so we don't hold the
 // lock while invoking user code, which could deadlock if a handler calls
 // AddEventHandler or RemoveEventHandler.
+//
+// NOTE(personal): added log output on panic so panics are visible in logs rather
+// than silently swallowed.
 func (cli *Client) dispatchEvent(evt interface{}) {
 	cli.eventHandlersLock.RLock()
 	handlers := cli.eventHandlers
